@@ -1,16 +1,75 @@
-# denetix
+# Denetix
 
-A new Flutter project.
+Denetix, Flutter ile geliştirilen modern bir saha denetim ve kontrol uygulamasıdır. Uygulama; offline-first mimari, checklist tabanlı denetimler, fotoğraflı kanıt toplama, dijital imza, otomatik PDF raporlama ve online senkronizasyon özellikleri ile saha operasyonlarını dijitalleştirmeyi hedefler.
 
-## Getting Started
+## Özellikler
 
-This project is a starting point for a Flutter application.
+* ✅ Offline-first çalışma yapısı
+* ✅ SQLite + Drift tabanlı lokal veri yönetimi
+* ✅ Dinamik checklist sistemi
+* ✅ Fotoğraf ekleme ve kanıt yönetimi
+* ✅ Dijital imza desteği
+* ✅ Otomatik PDF rapor oluşturma
+* ✅ Online senkronizasyon altyapısı
+* ✅ Flutter ile cross-platform mobil destek
+* ✅ Modern ve ölçeklenebilir mimari
 
-A few resources to get you started if this is your first Flutter project:
+## Mimari Yaklaşım
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Denetix uygulaması, internet bağlantısının olmadığı ortamlarda bile sorunsuz çalışabilmesi için offline-first yaklaşımıyla geliştirilmiştir.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Tüm denetim verileri cihaz üzerinde lokal olarak saklanır ve bağlantı sağlandığında merkezi sisteme senkronize edilir.
+
+Bu yapı sayesinde:
+
+* Veri kaybı riski azaltılır
+* Saha operasyonları kesintisiz devam eder
+* Düşük bağlantı kalitesinde bile stabil kullanım sağlanır
+
+---
+
+## Kullanım Senaryoları
+
+Denetix aşağıdaki alanlarda kullanılabilir:
+
+* Fabrika denetimleri
+* İş güvenliği kontrolleri
+* Kalite kontrol süreçleri
+* Şantiye saha denetimleri
+* Teknik servis kontrolleri
+* Franchise mağaza denetimleri
+* Hijyen ve uygunluk kontrolleri
+
+## Kurulum
+
+### Gereksinimler
+
+* Flutter SDK
+* Dart SDK
+* Android Studio / VSCode
+* Android Emulator veya fiziksel cihaz
+
+### Projeyi Çalıştırma
+
+```bash
+git clone https://github.com/yusuftannn/Denetix.git
+
+cd Denetix
+
+flutter pub get
+
+flutter run
+```
+
+---
+
+## Teknolojiler
+
+| Teknoloji     | Açıklama                              |
+| ------------- | ------------------------------------- |
+| Flutter       | Cross-platform mobil geliştirme       |
+| Dart          | Uygulama programlama dili             |
+| Drift         | SQLite ORM ve lokal database yönetimi |
+| SQLite        | Offline veri depolama                 |
+| PDF Generator | Otomatik rapor üretimi                |
+| Image Picker  | Fotoğraf yönetimi                     |
