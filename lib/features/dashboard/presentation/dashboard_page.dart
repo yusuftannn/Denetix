@@ -1,97 +1,118 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../application/dashboard_provider.dart';
 import '../../inspection/application/inspection_controller.dart';
-import '../../inspection/application/pdf_controller.dart';
 import '../../inspection/presentation/inspection_form_page.dart';
-import '../../../data/local/db/app_database.dart';
+
+import '../application/dashboard_provider.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inspections = ref.watch(dashboardInspectionsProvider);
+    final inspections =
+    ref.watch(dashboardInspectionsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Denetix')),
-      floatingActionButton: FloatingActionButton.extended(
+      appBar: AppBar(
+        title: const Text('Denetix'),
+      ),
+      floatingActionButton:
+      FloatingActionButton.extended(
         icon: const Icon(Icons.add),
         label: const Text('Yeni Denetim'),
         onPressed: () async {
           final controller =
-          ref.read(inspectionControllerProvider);
+          ref.read(
+            inspectionControllerProvider,
+          );
 
           final inspectionId =
-          await controller.startNewInspection();
+          await controller
+              .startNewInspection();
 
           if (!context.mounted) return;
 
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) =>
-                  InspectionFormPage(inspectionId: inspectionId),
+                  InspectionFormPage(
+                    inspectionId:
+                    inspectionId,
+                  ),
             ),
           );
         },
       ),
       body: inspections.when(
-        loading: () =>
-        const Center(child: CircularProgressIndicator()),
-        error: (e, _) =>
-            Center(child: Text(e.toString())),
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        error: (e, _) => Center(
+          child: Text(e.toString()),
+        ),
         data: (list) {
-          if (list.isEmpty) {
-            return const Center(
-              child: Text('Henüz denetim yok'),
-            );
-          }
+          final total = list.length;
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: list.length,
-            separatorBuilder: (_, __) =>
-            const SizedBox(height: 8),
-            itemBuilder: (_, i) {
-              final item = list[i];
+          final draftCount = list
+              .where(
+                (e) =>
+            e.status == 'draft',
+          )
+              .length;
 
-              return Card(
-                child: ListTile(
-                  title: Text(
-                    'Denetim #${item.id.substring(0, 6)}',
-                  ),
-                  subtitle: Text('Durum: ${item.status}'),
-                  trailing:
-                  const Icon(Icons.chevron_right),
+          final completedCount = list
+              .where(
+                (e) =>
+            e.status ==
+                'completed',
+          )
+              .length;
 
-                  onTap: () {
-                    if (item.status == 'draft') {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              InspectionFormPage(
-                                inspectionId: item.id,
-                              ),
-                        ),
-                      );
-                    } else if (item.status == 'completed') {
-                      ref
-                          .read(pdfControllerProvider)
-                          .generateAndPreview(item.id);
-                    }
-                  },
-
-                  onLongPress: () {
-                    _showInspectionActions(
-                      context,
-                      ref,
-                      item,
-                    );
-                  },
+          return SingleChildScrollView(
+            padding:
+            const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _StatCard(
+                        title:
+                        'Toplam Denetim',
+                        value:
+                        total.toString(),
+                        icon: Icons
+                            .assignment,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 12,
+                    ),
+                    Expanded(
+                      child: _StatCard(
+                        title: 'Taslak',
+                        value: draftCount
+                            .toString(),
+                        icon: Icons
+                            .edit_document,
+                      ),
+                    ),
+                  ],
                 ),
-              );
-            },
+                const SizedBox(
+                  height: 12,
+                ),
+                _StatCard(
+                  title: 'Tamamlanan',
+                  value: completedCount
+                      .toString(),
+                  icon:
+                  Icons.check_circle,
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -99,74 +120,41 @@ class DashboardPage extends ConsumerWidget {
   }
 }
 
-void _showInspectionActions(
-    BuildContext context,
-    WidgetRef ref,
-    Inspection item,
-    ) {
-  showModalBottomSheet(
-    context: context,
-    builder: (_) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (item.status == 'draft')
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Düzenle'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        InspectionFormPage(
-                          inspectionId: item.id,
-                        ),
-                  ),
-                );
-              },
-            ),
-          ListTile(
-            leading:
-            const Icon(Icons.delete, color: Colors.red),
-            title: const Text(
-              'Sil',
-              style: TextStyle(color: Colors.red),
-            ),
-            onTap: () async {
-              Navigator.pop(context);
+class _StatCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
 
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: const Text('Denetimi Sil'),
-                  content: const Text(
-                    'Bu denetim kalıcı olarak silinecek. Emin misiniz?',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () =>
-                          Navigator.pop(context, false),
-                      child: const Text('Vazgeç'),
-                    ),
-                    FilledButton(
-                      onPressed: () =>
-                          Navigator.pop(context, true),
-                      child: const Text('Sil'),
-                    ),
-                  ],
-                ),
-              );
+  const _StatCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+  });
 
-              if (confirm == true) {
-                ref
-                    .read(inspectionControllerProvider)
-                    .deleteInspection(item.id);
-              }
-            },
-          ),
-        ],
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding:
+        const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Icon(icon, size: 32),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style:
+              const TextStyle(
+                fontSize: 28,
+                fontWeight:
+                FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(title),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
