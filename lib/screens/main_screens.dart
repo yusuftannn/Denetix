@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/inspection/presentation/inspections_page.dart';
 import '../features/reports/presentation/reports_page.dart';
+import '../features/profile/presentation/profile_page.dart';
 
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -18,7 +19,7 @@ class MainScreen extends ConsumerWidget {
       const DashboardPage(),
       const InspectionsPage(),
       const ReportsPage(),
-      const _ProfilePage(),
+      const ProfilePage(),
     ];
 
     return Scaffold(
@@ -58,18 +59,3 @@ class MainScreen extends ConsumerWidget {
   }
 }
 
-class _ProfilePage extends StatelessWidget {
-  const _ProfilePage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil'),
-      ),
-      body: const Center(
-        child: Text('Profil yakında eklenecek'),
-      ),
-    );
-  }
-}
