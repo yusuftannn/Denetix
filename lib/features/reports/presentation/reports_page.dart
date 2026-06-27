@@ -350,7 +350,7 @@ class _InspectionListTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Denetim ID: ${inspection.id.substring(0, 8)}',
+                        inspection.checklistName ?? 'Denetim: ${inspection.id.substring(0, 8)}',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),

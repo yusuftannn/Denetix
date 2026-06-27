@@ -7,12 +7,14 @@ class InspectionLocalRepo {
 
   Future<void> createDraftInspection({
     required String id,
+    String? checklistName,
   }) {
     return db.into(db.inspections).insert(
       InspectionsCompanion.insert(
         id: id,
         status: 'draft',
         createdAt: DateTime.now(),
+        checklistName: Value(checklistName),
       ),
     );
   }

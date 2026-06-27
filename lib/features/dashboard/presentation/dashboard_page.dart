@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../inspection/application/inspection_controller.dart';
 import '../../inspection/presentation/inspection_form_page.dart';
 import '../application/dashboard_provider.dart';
+import '../../checklist/application/checklist_controller.dart';
 import 'widgets/dashboard_header.dart';
 import 'widgets/statistics_section.dart';
 import 'widgets/quick_actions_section.dart';
@@ -125,8 +126,22 @@ class DashboardPage extends ConsumerWidget {
   }
 
   void _startNewInspection(BuildContext context, WidgetRef ref) async {
+    final selection = await showModalBottomSheet<Map<String, String>>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => const _TemplateSelectionSheet(),
+    );
+
+    if (selection == null) return;
+
+    final checklistId = selection['id'];
+    final checklistName = selection['name'];
+
     final controller = ref.read(inspectionControllerProvider);
-    final inspectionId = await controller.startNewInspection();
+    final inspectionId = await controller.startNewInspection(
+      checklistId: checklistId,
+      checklistName: checklistName,
+    );
 
     if (!context.mounted) return;
 
@@ -141,6 +156,102 @@ class DashboardPage extends ConsumerWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => InspectionFormPage(inspectionId: inspectionId),
+      ),
+    );
+  }
+}
+
+class _TemplateSelectionSheet extends ConsumerWidget {
+  const _TemplateSelectionSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final checklistsAsync = ref.watch(checklistsStreamProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Denetim Şablonu Seçin',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Başlatmak istediğiniz denetim türüne uygun şablonu seçin.',
+            style: TextStyle(color: Colors.grey.shade600),
+          ),
+          const SizedBox(height: 16),
+          Flexible(
+            child: checklistsAsync.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              error: (err, _) => Center(child: Text('Hata: $err')),
+              data: (list) {
+                return ListView(
+                  shrinkWrap: true,
+                  physics: const ClampingScrollPhysics(),
+                  children: [
+                    Card(
+                      elevation: 0.5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      child: ListTile(
+                        leading: const CircleAvatar(
+                          backgroundColor: Colors.blue,
+                          child: Icon(Icons.assignment, color: Colors.white),
+                        ),
+                        title: const Text('Genel Denetim (Varsayılan)'),
+                        subtitle: const Text('Temel iş yeri güvenliği kontrol maddeleri'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.pop(context, {'id': '', 'name': 'Genel Denetim'}),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...list.map((template) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Card(
+                            elevation: 0.5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: Colors.grey.shade200),
+                            ),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                child: const Icon(Icons.list_alt, color: Colors.white),
+                              ),
+                              title: Text(template.name),
+                              subtitle: const Text('Özel denetim şablonu'),
+                              trailing: const Icon(Icons.chevron_right),
+                              onTap: () => Navigator.pop(context, {
+                                'id': template.id,
+                                'name': template.name,
+                              }),
+                            ),
+                          ),
+                        )),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }

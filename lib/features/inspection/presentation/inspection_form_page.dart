@@ -16,12 +16,7 @@ class InspectionFormPage extends ConsumerWidget {
 
   const InspectionFormPage({super.key, required this.inspectionId});
 
-  static const items = [
-    'Yangın tüpü mevcut mu?',
-    'Acil çıkışlar açık mı?',
-    'Elektrik panosu güvenli mi?',
-    'Zemin kaygan mı?',
-  ];
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -77,14 +72,10 @@ class InspectionFormPage extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              ...items.map((title) {
-                final saved = savedItems
-                    .where((e) => e.title == title)
-                    .toList();
-
-                final currentResult = saved.isEmpty
+              ...savedItems.map((item) {
+                final currentResult = item.result.isEmpty
                     ? null
-                    : InspectionResultX.from(saved.first.result);
+                    : InspectionResultX.from(item.result);
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
@@ -94,7 +85,7 @@ class InspectionFormPage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          title,
+                          item.title,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 8),
@@ -109,7 +100,7 @@ class InspectionFormPage extends ConsumerWidget {
                                     .read(inspectionItemControllerProvider)
                                     .setResult(
                                       inspectionId: inspectionId,
-                                      title: title,
+                                      title: item.title,
                                       result: r.value,
                                     );
                               },

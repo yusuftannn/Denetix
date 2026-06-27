@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/inspection/presentation/inspections_page.dart';
+import '../features/checklist/presentation/checklist_list_page.dart';
 import '../features/reports/presentation/reports_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 
@@ -18,6 +19,7 @@ class MainScreen extends ConsumerWidget {
     final List<Widget> screens = [
       const DashboardPage(),
       const InspectionsPage(),
+      const ChecklistListPage(),
       const ReportsPage(),
       const ProfilePage(),
     ];
@@ -42,6 +44,11 @@ class MainScreen extends ConsumerWidget {
             icon: Icon(Icons.assignment_outlined),
             selectedIcon: Icon(Icons.assignment),
             label: 'Denetimler',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.list_alt_outlined),
+            selectedIcon: Icon(Icons.list_alt),
+            label: 'Şablonlar',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),

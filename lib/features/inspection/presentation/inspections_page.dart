@@ -46,10 +46,10 @@ class InspectionsPage extends ConsumerWidget {
               return Card(
                 child: ListTile(
                   title: Text(
-                    'Denetim #${item.id.substring(0, 6)}',
+                    item.checklistName ?? 'Denetim #${item.id.substring(0, 6)}',
                   ),
                   subtitle: Text(
-                    'Durum: ${item.status}',
+                    'Durum: ${item.status == 'draft' ? 'Taslak' : (item.status == 'completed' ? 'Tamamlandı' : item.status)}',
                   ),
                   trailing: const Icon(
                     Icons.chevron_right,

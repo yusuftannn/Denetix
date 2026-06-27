@@ -16,13 +16,24 @@ class InspectionItemLocalRepo {
     required String title,
     required String result,
   }) async {
-    await db.into(db.inspectionItems).insert(
-      InspectionItemsCompanion.insert(
-        inspectionId: inspectionId,
-        title: title,
-        result: result,
-      ),
-      mode: InsertMode.insertOrReplace,
-    );
+    final existing = await (db.select(db.inspectionItems)
+          ..where((t) => t.inspectionId.equals(inspectionId) & t.title.equals(title)))
+        .getSingleOrNull();
+
+    if (existing != null) {
+      await (db.update(db.inspectionItems)
+            ..where((t) => t.id.equals(existing.id)))
+          .write(InspectionItemsCompanion(
+            result: Value(result),
+          ));
+    } else {
+      await db.into(db.inspectionItems).insert(
+        InspectionItemsCompanion.insert(
+          inspectionId: inspectionId,
+          title: title,
+          result: result,
+        ),
+      );
+    }
   }
 }
